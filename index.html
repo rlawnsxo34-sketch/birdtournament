@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새소리 이상형 월드컵</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 폰트 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 기본 폰트를 세련된 Pretendard(또는 시스템 폰트)로 설정 */
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); /* 고급스러운 슬레이트 그라데이션 */
+            color: #1e293b;
+        }
+        
+        /* 카드 호버 효과: 부드럽게 떠오르며 그림자 강조 */
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border-color: #cbd5e1;
+        }
+
+        /* 오디오 플레이어 깔끔하게 감싸기 */
+        audio {
+            width: 100%;
+            height: 54px;
+            outline: none;
+            border-radius: 100px;
+        }
+        
+        audio::-webkit-media-controls-panel {
+            background-color: #f8fafc;
+        }
+
+        /* 페이드 인 애니메이션 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 유리 질감 효과 (Glassmorphism) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-teal-200 selection:text-teal-900">
+
+    <!-- 헤더 -->
+    <header class="glass-panel sticky top-0 z-50 px-8 py-5 flex items-center justify-center shadow-sm">
+        <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+            <span class="text-teal-600">🌿</span> 새소리 월드컵
+        </h1>
+    </header>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="flex-grow flex items-center justify-center p-6 md:p-12 relative overflow-hidden">
+        
+        <!-- 배경 장식 (블러 원형) -->
+        <div class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-teal-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-blue-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40"></div>
+
+        <!-- 1. 시작 화면 -->
+        <div id="start-screen" class="glass-panel rounded-[2rem] shadow-2xl p-10 md:p-16 max-w-4xl w-full text-center relative z-10 fade-in">
+            <span class="inline-block py-1 px-4 rounded-full bg-teal-100 text-teal-700 font-bold text-sm tracking-widest mb-6">SOUND TOURNAMENT</span>
+            <h2 class="text-4xl md:text-6xl font-bold mb-6 text-slate-800 break-keep leading-tight">가장 아름다운<br/>새소리를 찾아보세요</h2>
+            <p class="text-slate-500 mb-12 text-lg md:text-xl break-keep font-medium">진행할 라운드를 선택하여 이상형 월드컵을 시작합니다.</p>
+            
+            <div class="flex flex-wrap justify-center gap-4 md:gap-5" id="round-buttons">
+                <!-- 자바스크립트에서 버튼을 생성합니다 -->
+            </div>
+        </div>
+
+        <!-- 2. 게임(월드컵) 화면 -->
+        <div id="game-screen" class="hidden w-full max-w-[90rem] flex-col items-center relative z-10 fade-in">
+            
+            <div class="glass-panel px-10 py-4 rounded-full shadow-lg mb-10 flex flex-col items-center border border-white">
+                <h2 id="round-info" class="text-3xl md:text-4xl font-black text-teal-600 tracking-tight">16강</h2>
+                <p id="match-progress" class="text-center text-lg md:text-xl font-bold text-slate-400 mt-1">1 / 8</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full relative">
+                
+                <!-- 왼쪽 후보 -->
+                <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-6 md:p-8 w-full md:w-[45%] cursor-pointer card-hover relative group flex flex-col" onclick="selectCandidate(0, event)">
+                    <div class="aspect-square w-full rounded-3xl overflow-hidden bg-slate-100 mb-8 relative shadow-inner">
+                        <img id="img-left" src="" alt="새 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=No+Image';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    
+                    <div class="flex-grow flex flex-col justify-between">
+                        <h3 id="name-left" class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-8 text-center tracking-tight break-keep">이름</h3>
+                        
+                        <div class="space-y-6 w-full">
+                            <div class="w-full bg-slate-50 p-2 rounded-full border border-slate-100" onclick="event.stopPropagation();">
+                                <audio id="audio-left" controls controlsList="nodownload"></audio>
+                            </div>
+                            <button class="bg-slate-800 text-white font-bold py-5 px-8 text-2xl md:text-3xl rounded-full group-hover:bg-teal-600 transition-colors duration-300 w-full shadow-lg flex items-center justify-center gap-3">
+                                <span>선택하기</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VS 마크 (세련된 뱃지 스타일) -->
+                <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-24 h-24 md:w-32 md:h-32 bg-white rounded-full shadow-2xl flex items-center justify-center border-8 border-slate-50 hidden md:flex">
+                    <span class="text-3xl md:text-4xl font-black text-slate-300 italic tracking-tighter">VS</span>
+                </div>
+
+                <!-- 오른쪽 후보 -->
+                <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-6 md:p-8 w-full md:w-[45%] cursor-pointer card-hover relative group flex flex-col" onclick="selectCandidate(1, event)">
+                    <div class="aspect-square w-full rounded-3xl overflow-hidden bg-slate-100 mb-8 relative shadow-inner">
+                        <img id="img-right" src="" alt="새 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=No+Image';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    
+                    <div class="flex-grow flex flex-col justify-between">
+                        <h3 id="name-right" class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-8 text-center tracking-tight break-keep">이름</h3>
+                        
+                        <div class="space-y-6 w-full">
+                            <div class="w-full bg-slate-50 p-2 rounded-full border border-slate-100" onclick="event.stopPropagation();">
+                                <audio id="audio-right" controls controlsList="nodownload"></audio>
+                            </div>
+                            <button class="bg-slate-800 text-white font-bold py-5 px-8 text-2xl md:text-3xl rounded-full group-hover:bg-teal-600 transition-colors duration-300 w-full shadow-lg flex items-center justify-center gap-3">
+                                <span>선택하기</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. 결과(우승) 화면 -->
+        <div id="result-screen" class="hidden glass-panel rounded-[2rem] shadow-2xl p-10 md:p-20 max-w-4xl w-full text-center relative z-10 fade-in">
+            <span class="inline-block py-1 px-4 rounded-full bg-yellow-100 text-yellow-700 font-bold text-sm tracking-widest mb-4">WINNER</span>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-500 mb-4 break-keep">최종 우승</h2>
+            <h3 id="winner-name" class="text-5xl md:text-7xl font-black text-slate-800 mb-12 break-keep tracking-tight">우승자 이름</h3>
+            
+            <div class="aspect-square w-full max-w-md md:max-w-lg mx-auto rounded-full overflow-hidden shadow-2xl bg-white mb-12 border-8 border-white relative group">
+                <img id="winner-img" src="" alt="우승 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=Winner';" class="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110">
+                <div class="absolute -top-4 -right-4 md:-top-2 md:-right-2 text-7xl md:text-8xl drop-shadow-2xl animate-bounce">👑</div>
+            </div>
+            
+            <div class="mb-14 bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                <p class="text-lg md:text-xl text-slate-500 font-bold mb-4 break-keep">우승한 새의 소리 감상하기</p>
+                <audio id="winner-audio" controls class="mx-auto w-full md:w-5/6"></audio>
+            </div>
+
+            <button onclick="location.reload()" class="bg-slate-800 text-white font-bold py-5 px-12 md:py-6 md:px-16 text-2xl md:text-3xl rounded-full hover:bg-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 break-keep">
+                새로운 라운드 시작하기
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        /* ========================================================================
+        데이터 설정 영역
+        ======================================================================== */
+        const birdData = [
+            { name: "참새", image: "참새.jpg", sound: "참새.mp3" },
+            { name: "비둘기", image: "비둘기.png", sound: "비둘기.wav" },
+            { name: "까치", image: "까치.jpg", sound: "까치.mp3" },
+            { name: "까마귀", image: "까마귀.png", sound: "까마귀.wav" },
+            { name: "꾀꼬리", image: "꾀꼬리.jpg", sound: "꾀꼬리.mp3" },
+            { name: "직박구리", image: "직박구리.jpg", sound: "직박구리.mp3" },
+            { name: "박새", image: "박새.png", sound: "박새.wav" },
+            { name: "뱁새", image: "뱁새.jpg", sound: "뱁새.mp3" },
+            { name: "독수리", image: "독수리.jpg", sound: "독수리.mp3" },
+            { name: "올빼미", image: "올빼미.png", sound: "올빼미.wav" },
+            { name: "소쩍새", image: "소쩍새.jpg", sound: "소쩍새.mp3" },
+            { name: "뻐꾸기", image: "뻐꾸기.jpg", sound: "뻐꾸기.mp3" },
+            { name: "갈매기", image: "갈매기.png", sound: "갈매기.wav" },
+            { name: "백조", image: "백조.jpg", sound: "백조.mp3" },
+            { name: "펭귄", image: "펭귄.png", sound: "펭귄.wav" },
+            { name: "타조", image: "타조.jpg", sound: "타조.mp3" },
+            { name: "두루미", image: "두루미.jpg", sound: "두루미.mp3" },
+            { name: "황새", image: "황새.jpg", sound: "황새.mp3" },
+            { name: "왜가리", image: "왜가리.jpg", sound: "왜가리.mp3" },
+            { name: "따오기", image: "따오기.jpg", sound: "따오기.mp3" },
+            { name: "원앙", image: "원앙.jpg", sound: "원앙.mp3" },
+            { name: "청둥오리", image: "청둥오리.jpg", sound: "청둥오리.mp3" },
+            { name: "가마우지", image: "가마우지.jpg", sound: "가마우지.mp3" },
+            { name: "딱따구리", image: "딱따구리.jpg", sound: "딱따구리.mp3" },
+            { name: "파랑새", image: "파랑새.jpg", sound: "파랑새.mp3" },
+            { name: "동박새", image: "동박새.jpg", sound: "동박새.mp3" },
+            { name: "종다리", image: "종다리.jpg", sound: "종다리.mp3" },
+            { name: "방울새", image: "방울새.jpg", sound: "방울새.mp3" },
+            { name: "지빠귀", image: "지빠귀.jpg", sound: "지빠귀.mp3" },
+            { name: "멧비둘기", image: "멧비둘기.jpg", sound: "멧비둘기.mp3" },
+            { name: "매", image: "매.jpg", sound: "매.mp3" },
+            { name: "부엉이", image: "부엉이.jpg", sound: "부엉이.mp3" }
+        ];
+
+        // --- 여기서부터는 게임 동작을 위한 시스템 코드입니다 ---
+
+        let currentParticipants = [];
+        let nextRoundParticipants = [];
+        let currentMatchIndex = 0;
+        let totalRoundMatches = 0;
+
+        // 시작 화면 로드 시 버튼 생성
+        window.onload = function() {
+            const buttonContainer = document.getElementById('round-buttons');
+            const possibleRounds = [4, 8, 16, 32, 64].filter(num => num <= birdData.length);
+            
+            if (possibleRounds.length === 0) {
+                buttonContainer.innerHTML = `<p class="col-span-2 text-rose-500 text-xl font-bold break-keep">데이터가 부족합니다. (최소 4개 이상 필요)</p>`;
+                return;
+            }
+
+            possibleRounds.forEach(round => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white text-slate-700 border border-slate-200 font-bold py-4 px-8 md:py-5 md:px-10 text-2xl md:text-3xl rounded-2xl hover:bg-teal-600 hover:text-white hover:border-teal-600 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex-grow md:flex-grow-0 break-keep";
+                btn.innerText = `${round}강 시작`;
+                btn.onclick = () => startGame(round);
+                buttonContainer.appendChild(btn);
+            });
+        };
+
+        // 배열 무작위 섞기 알고리즘
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        // 게임 시작
+        function startGame(roundSize) {
+            currentParticipants = shuffleArray([...birdData]).slice(0, roundSize);
+            nextRoundParticipants = [];
+            currentMatchIndex = 0;
+            
+            document.getElementById('start-screen').classList.add('hidden');
+            
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+            
+            // 화면 전환 시 페이드 인 애니메이션 재시작
+            gameScreen.classList.remove('fade-in');
+            void gameScreen.offsetWidth; // DOM 리플로우 강제 트리거
+            gameScreen.classList.add('fade-in');
+            
+            updateMatchScreen();
+        }
+
+        // 화면에 후보 2개 렌더링
+        function updateMatchScreen() {
+            const leftBird = currentParticipants[currentMatchIndex * 2];
+            const rightBird = currentParticipants[currentMatchIndex * 2 + 1];
+            
+            totalRoundMatches = currentParticipants.length / 2;
+
+            let roundText = currentParticipants.length === 2 ? "결승전" : `${currentParticipants.length}강`;
+            document.getElementById('round-info').innerText = roundText;
+            document.getElementById('match-progress').innerText = `Match ${currentMatchIndex + 1} / ${totalRoundMatches}`;
+
+            // 왼쪽 후보 데이터 반영 및 안정성 로드
+            document.getElementById('name-left').innerText = leftBird.name;
+            document.getElementById('img-left').src = leftBird.image;
+            const audioLeft = document.getElementById('audio-left');
+            audioLeft.src = leftBird.sound || "";
+            try { audioLeft.load(); } catch (e) { console.warn("좌측 오디오 로드 에러:", e); }
+
+            // 오른쪽 후보 데이터 반영 및 안정성 로드
+            document.getElementById('name-right').innerText = rightBird.name;
+            document.getElementById('img-right').src = rightBird.image;
+            const audioRight = document.getElementById('audio-right');
+            audioRight.src = rightBird.sound || "";
+            try { audioRight.load(); } catch (e) { console.warn("우측 오디오 로드 에러:", e); }
+        }
+
+        // 후보 선택 시 처리
+        let isProcessing = false;
+
+        function selectCandidate(selectedIndex, event) {
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            try {
+                document.getElementById('audio-left').pause();
+                document.getElementById('audio-right').pause();
+            } catch (e) {
+                console.warn("오디오 정지 중 경고:", e);
+            }
+
+            const winner = currentParticipants[currentMatchIndex * 2 + selectedIndex];
+            nextRoundParticipants.push(winner);
+
+            currentMatchIndex++;
+
+            if (currentMatchIndex >= totalRoundMatches) {
+                currentParticipants = nextRoundParticipants;
+                nextRoundParticipants = [];
+                currentMatchIndex = 0;
+
+                if (currentParticipants.length === 1) {
+                    showResult(currentParticipants[0]);
+                } else {
+                    animateCardTransition();
+                }
+            } else {
+                animateCardTransition();
+            }
+
+            setTimeout(() => {
+                isProcessing = false;
+            }, 300);
+        }
+
+        // 카드 넘어갈 때 부드러운 애니메이션 효과
+        function animateCardTransition() {
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.style.opacity = '0';
+            gameScreen.style.transform = 'scale(0.98)';
+            gameScreen.style.transition = 'all 0.2s ease-out';
+            
+            setTimeout(() => {
+                updateMatchScreen();
+                gameScreen.style.opacity = '1';
+                gameScreen.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // 결과 화면 표시
+        function showResult(winner) {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('flex');
+            
+            const resultScreen = document.getElementById('result-screen');
+            resultScreen.classList.remove('hidden');
+            
+            // 결과 화면 페이드 인
+            resultScreen.classList.remove('fade-in');
+            void resultScreen.offsetWidth;
+            resultScreen.classList.add('fade-in');
+
+            document.getElementById('winner-name').innerText = winner.name;
+            document.getElementById('winner-img').src = winner.image;
+            
+            // 우승자 이미지 둥글게(원형) 표시
+            const winnerImgContainer = document.getElementById('winner-img').parentElement;
+            winnerImgContainer.classList.add('rounded-full');
+
+            const winnerAudio = document.getElementById('winner-audio');
+            winnerAudio.src = winner.sound || "";
+            try { winnerAudio.load(); } catch (e) { console.warn("우승자 오디오 로드 에러:", e); }
+        }
+    </script>
+</body>
+</html>
