@@ -12,127 +12,167 @@
         /* 기본 폰트를 세련된 Pretendard(또는 시스템 폰트)로 설정 */
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); /* 고급스러운 슬레이트 그라데이션 */
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             color: #1e293b;
         }
         
-        /* 카드 호버 효과: 부드럽게 떠오르며 그림자 강조 */
-        .card-hover {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        /* 커스텀 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .card-hover:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            border-color: #cbd5e1;
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
-        /* 오디오 플레이어 깔끔하게 감싸기 */
+        /* 카드 호버 효과: 부드럽게 떠오르며 그림자 강조 */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(13, 148, 136, 0.15);
+            border-color: rgba(20, 184, 166, 0.3);
+        }
+
+        /* 오디오 플레이어 스타일 */
         audio {
             width: 100%;
-            height: 54px;
+            height: 48px;
             outline: none;
             border-radius: 100px;
         }
-        
         audio::-webkit-media-controls-panel {
-            background-color: #f8fafc;
+            background-color: transparent;
         }
 
         /* 페이드 인 애니메이션 */
         .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+            animation: fadeIn 0.4s ease-out forwards;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 둥둥 떠다니는 애니메이션 (마스코트용) */
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
         }
 
         /* 유리 질감 효과 (Glassmorphism) */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-teal-200 selection:text-teal-900">
+<body class="h-screen w-screen overflow-hidden flex flex-col antialiased selection:bg-teal-200 selection:text-teal-900">
 
-    <!-- 헤더 -->
-    <header class="glass-panel sticky top-0 z-50 px-8 py-5 flex items-center justify-center shadow-sm">
-        <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-            <span class="text-teal-600">🌿</span> 새소리 월드컵
+    <!-- 헤더 (상단 고정) -->
+    <header class="glass-panel shrink-0 px-6 md:px-8 py-4 flex items-center justify-between relative z-50">
+        <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2 cursor-pointer" onclick="goHome()">
+            <span class="text-teal-500 text-3xl md:text-4xl">🌿</span> 새소리 월드컵
         </h1>
+        
+        <!-- 홈으로 돌아가기 버튼 -->
+        <button id="home-btn" onclick="goHome()" class="hidden group flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 rounded-full font-bold text-sm md:text-base transition-all duration-300 border border-slate-200 shadow-sm hover:shadow-md">
+            <span class="text-lg group-hover:scale-110 transition-transform">🏠</span>
+            <span class="hidden sm:inline">처음으로</span>
+        </button>
     </header>
 
     <!-- 메인 컨텐츠 영역 -->
-    <main class="flex-grow flex items-center justify-center p-6 md:p-12 relative overflow-hidden">
+    <main class="flex-1 overflow-y-auto md:overflow-hidden flex items-center justify-center p-4 md:p-8 relative">
         
         <!-- 배경 장식 (블러 원형) -->
-        <div class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-teal-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-blue-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40"></div>
+        <div class="absolute top-[10%] left-[5%] w-[40vw] h-[40vw] bg-teal-200 rounded-full mix-blend-multiply filter blur-[120px] opacity-40 pointer-events-none"></div>
+        <div class="absolute bottom-[10%] right-[5%] w-[40vw] h-[40vw] bg-blue-200 rounded-full mix-blend-multiply filter blur-[120px] opacity-40 pointer-events-none"></div>
 
-        <!-- 1. 시작 화면 -->
-        <div id="start-screen" class="glass-panel rounded-[2rem] shadow-2xl p-10 md:p-16 max-w-4xl w-full text-center relative z-10 fade-in">
-            <span class="inline-block py-1 px-4 rounded-full bg-teal-100 text-teal-700 font-bold text-sm tracking-widest mb-6">SOUND TOURNAMENT</span>
-            <h2 class="text-4xl md:text-6xl font-bold mb-6 text-slate-800 break-keep leading-tight">가장 아름다운<br/>새소리를 찾아보세요</h2>
-            <p class="text-slate-500 mb-12 text-lg md:text-xl break-keep font-medium">진행할 라운드를 선택하여 이상형 월드컵을 시작합니다.</p>
+        <!-- ==========================================
+             1. 시작 화면
+             ========================================== -->
+        <div id="start-screen" class="glass-panel rounded-[2rem] p-8 md:p-14 max-w-4xl w-full text-center relative z-10 fade-in max-h-full overflow-y-auto custom-scrollbar flex flex-col items-center">
             
-            <div class="flex flex-wrap justify-center gap-4 md:gap-5" id="round-buttons">
+            <!-- 업로드해주신 마리 캐릭터 이미지 적용 (경로를 파일명과 동일하게 지정) -->
+            <img src="계절(봄)_새와_함께_마리.png" alt="새와 함께 마리" class="w-48 md:w-56 h-auto mb-6 animate-float drop-shadow-xl" onerror="this.style.display='none';">
+
+            <span class="inline-block py-1.5 px-5 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 text-teal-700 font-bold text-sm tracking-widest mb-6 shadow-sm">SOUND TOURNAMENT</span>
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-slate-800 break-keep leading-tight">가장 아름다운<br/>새소리를 찾아보세요</h2>
+            <p class="text-slate-500 mb-10 text-lg md:text-xl break-keep font-medium">진행할 라운드를 선택하여 이상형 월드컵을 시작합니다.</p>
+            
+            <div class="flex flex-wrap justify-center gap-4 w-full" id="round-buttons">
                 <!-- 자바스크립트에서 버튼을 생성합니다 -->
             </div>
         </div>
 
-        <!-- 2. 게임(월드컵) 화면 -->
-        <div id="game-screen" class="hidden w-full max-w-[90rem] flex-col items-center relative z-10 fade-in">
+        <!-- ==========================================
+             2. 게임(월드컵) 화면
+             ========================================== -->
+        <div id="game-screen" class="hidden w-full h-full max-w-[90rem] flex-col items-center justify-center relative z-10 fade-in py-2">
             
-            <div class="glass-panel px-10 py-4 rounded-full shadow-lg mb-10 flex flex-col items-center border border-white">
-                <h2 id="round-info" class="text-3xl md:text-4xl font-black text-teal-600 tracking-tight">16강</h2>
-                <p id="match-progress" class="text-center text-lg md:text-xl font-bold text-slate-400 mt-1">1 / 8</p>
+            <!-- 라운드 정보 헤더 -->
+            <div class="glass-panel px-8 py-2 md:py-3 rounded-full shadow-md mb-4 md:mb-6 shrink-0 flex flex-col items-center border border-white">
+                <h2 id="round-info" class="text-2xl md:text-3xl font-black text-teal-600 tracking-tight">16강</h2>
+                <p id="match-progress" class="text-sm md:text-base font-bold text-slate-400 mt-0.5">Match 1 / 8</p>
             </div>
 
-            <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full relative">
+            <!-- 카드 컨테이너 -->
+            <div class="flex-1 min-h-0 w-full flex flex-col md:flex-row items-stretch justify-center gap-6 md:gap-10 relative">
                 
                 <!-- 왼쪽 후보 -->
-                <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-6 md:p-8 w-full md:w-[45%] cursor-pointer card-hover relative group flex flex-col" onclick="selectCandidate(0, event)">
-                    <div class="aspect-square w-full rounded-3xl overflow-hidden bg-slate-100 mb-8 relative shadow-inner">
-                        <img id="img-left" src="" alt="새 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=No+Image';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="bg-white/90 backdrop-blur-md rounded-[2rem] shadow-xl border border-white p-5 w-full md:w-[45%] h-[400px] md:h-full max-h-[700px] cursor-pointer card-hover relative group flex flex-col" onclick="selectCandidate(0, event)">
+                    <div class="flex-1 min-h-0 w-full relative bg-slate-50 rounded-2xl overflow-hidden mb-5">
+                        <img id="img-left" src="" alt="새 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=No+Image';" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     
-                    <div class="flex-grow flex flex-col justify-between">
-                        <h3 id="name-left" class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-8 text-center tracking-tight break-keep">이름</h3>
-                        
-                        <div class="space-y-6 w-full">
-                            <div class="w-full bg-slate-50 p-2 rounded-full border border-slate-100" onclick="event.stopPropagation();">
+                    <div class="shrink-0 flex flex-col items-center">
+                        <h3 id="name-left" class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight break-keep">이름</h3>
+                        <div class="w-full space-y-4">
+                            <div class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200" onclick="event.stopPropagation();">
                                 <audio id="audio-left" controls controlsList="nodownload"></audio>
                             </div>
-                            <button class="bg-slate-800 text-white font-bold py-5 px-8 text-2xl md:text-3xl rounded-full group-hover:bg-teal-600 transition-colors duration-300 w-full shadow-lg flex items-center justify-center gap-3">
+                            <button class="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold py-3.5 md:py-4 px-6 text-xl md:text-2xl rounded-full group-hover:from-teal-500 group-hover:to-emerald-500 transition-all duration-300 w-full shadow-lg flex items-center justify-center gap-2">
                                 <span>선택하기</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- VS 마크 (세련된 뱃지 스타일) -->
-                <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-24 h-24 md:w-32 md:h-32 bg-white rounded-full shadow-2xl flex items-center justify-center border-8 border-slate-50 hidden md:flex">
-                    <span class="text-3xl md:text-4xl font-black text-slate-300 italic tracking-tighter">VS</span>
+                <!-- VS 뱃지 -->
+                <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-16 h-16 md:w-20 md:h-20 bg-white/90 backdrop-blur-md rounded-full shadow-xl flex items-center justify-center border-4 border-slate-50 hidden md:flex">
+                    <span class="text-xl md:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-br from-slate-400 to-slate-600 italic tracking-tighter">VS</span>
                 </div>
 
                 <!-- 오른쪽 후보 -->
-                <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-6 md:p-8 w-full md:w-[45%] cursor-pointer card-hover relative group flex flex-col" onclick="selectCandidate(1, event)">
-                    <div class="aspect-square w-full rounded-3xl overflow-hidden bg-slate-100 mb-8 relative shadow-inner">
-                        <img id="img-right" src="" alt="새 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=No+Image';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="bg-white/90 backdrop-blur-md rounded-[2rem] shadow-xl border border-white p-5 w-full md:w-[45%] h-[400px] md:h-full max-h-[700px] cursor-pointer card-hover relative group flex flex-col" onclick="selectCandidate(1, event)">
+                    <div class="flex-1 min-h-0 w-full relative bg-slate-50 rounded-2xl overflow-hidden mb-5">
+                        <img id="img-right" src="" alt="새 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=No+Image';" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     
-                    <div class="flex-grow flex flex-col justify-between">
-                        <h3 id="name-right" class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-8 text-center tracking-tight break-keep">이름</h3>
-                        
-                        <div class="space-y-6 w-full">
-                            <div class="w-full bg-slate-50 p-2 rounded-full border border-slate-100" onclick="event.stopPropagation();">
+                    <div class="shrink-0 flex flex-col items-center">
+                        <h3 id="name-right" class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight break-keep">이름</h3>
+                        <div class="w-full space-y-4">
+                            <div class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200" onclick="event.stopPropagation();">
                                 <audio id="audio-right" controls controlsList="nodownload"></audio>
                             </div>
-                            <button class="bg-slate-800 text-white font-bold py-5 px-8 text-2xl md:text-3xl rounded-full group-hover:bg-teal-600 transition-colors duration-300 w-full shadow-lg flex items-center justify-center gap-3">
+                            <button class="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold py-3.5 md:py-4 px-6 text-xl md:text-2xl rounded-full group-hover:from-teal-500 group-hover:to-emerald-500 transition-all duration-300 w-full shadow-lg flex items-center justify-center gap-2">
                                 <span>선택하기</span>
                             </button>
                         </div>
@@ -142,25 +182,31 @@
             </div>
         </div>
 
-        <!-- 3. 결과(우승) 화면 -->
-        <div id="result-screen" class="hidden glass-panel rounded-[2rem] shadow-2xl p-10 md:p-20 max-w-4xl w-full text-center relative z-10 fade-in">
-            <span class="inline-block py-1 px-4 rounded-full bg-yellow-100 text-yellow-700 font-bold text-sm tracking-widest mb-4">WINNER</span>
-            <h2 class="text-2xl md:text-3xl font-bold text-slate-500 mb-4 break-keep">최종 우승</h2>
-            <h3 id="winner-name" class="text-5xl md:text-7xl font-black text-slate-800 mb-12 break-keep tracking-tight">우승자 이름</h3>
-            
-            <div class="aspect-square w-full max-w-md md:max-w-lg mx-auto rounded-full overflow-hidden shadow-2xl bg-white mb-12 border-8 border-white relative group">
-                <img id="winner-img" src="" alt="우승 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=Winner';" class="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110">
-                <div class="absolute -top-4 -right-4 md:-top-2 md:-right-2 text-7xl md:text-8xl drop-shadow-2xl animate-bounce">👑</div>
+        <!-- ==========================================
+             3. 결과(우승) 화면
+             ========================================== -->
+        <div id="result-screen" class="hidden glass-panel rounded-[2rem] p-10 md:p-14 max-w-3xl w-full h-full max-h-[800px] flex-col items-center justify-center text-center relative z-10 fade-in">
+            <div class="shrink-0">
+                <span class="inline-block py-1.5 px-5 rounded-full bg-gradient-to-r from-yellow-50 to-amber-50 text-amber-700 font-bold text-sm tracking-widest mb-4 shadow-sm border border-yellow-100">WINNER</span>
+                <h2 class="text-xl md:text-2xl font-bold text-slate-500 mb-2 break-keep">최종 우승</h2>
+                <h3 id="winner-name" class="text-5xl md:text-6xl font-black text-slate-800 mb-8 break-keep tracking-tight">우승자 이름</h3>
             </div>
             
-            <div class="mb-14 bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                <p class="text-lg md:text-xl text-slate-500 font-bold mb-4 break-keep">우승한 새의 소리 감상하기</p>
-                <audio id="winner-audio" controls class="mx-auto w-full md:w-5/6"></audio>
+            <div class="flex-1 min-h-0 w-full max-w-[40vh] aspect-square mx-auto rounded-full overflow-hidden shadow-2xl bg-white mb-8 border-8 border-white relative group shrink-0">
+                <img id="winner-img" src="" alt="우승 이미지" onerror="this.onerror=null; this.src='https://placehold.co/800x800/f8fafc/94a3b8?text=Winner';" class="absolute inset-0 w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110">
+                <div class="absolute -top-2 -right-2 md:top-2 md:right-2 text-6xl md:text-7xl drop-shadow-2xl animate-bounce">👑</div>
             </div>
+            
+            <div class="shrink-0 w-full">
+                <div class="mb-8 bg-slate-50/80 p-5 rounded-3xl border border-slate-200 shadow-inner">
+                    <p class="text-base md:text-lg text-slate-500 font-bold mb-3 break-keep">우승한 새의 소리 감상하기</p>
+                    <audio id="winner-audio" controls class="mx-auto w-full md:w-4/5"></audio>
+                </div>
 
-            <button onclick="location.reload()" class="bg-slate-800 text-white font-bold py-5 px-12 md:py-6 md:px-16 text-2xl md:text-3xl rounded-full hover:bg-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 break-keep">
-                새로운 라운드 시작하기
-            </button>
+                <button onclick="goHome(true)" class="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold py-4 px-10 md:py-5 md:px-14 text-xl md:text-2xl rounded-full hover:from-teal-600 hover:to-teal-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 break-keep">
+                    새로운 라운드 시작하기
+                </button>
+            </div>
         </div>
 
     </main>
@@ -204,14 +250,14 @@
             { name: "부엉이", image: "부엉이.jpg", sound: "부엉이.mp3" }
         ];
 
-        // --- 여기서부터는 게임 동작을 위한 시스템 코드입니다 ---
-
+        // 상태 관리 변수
         let currentParticipants = [];
         let nextRoundParticipants = [];
         let currentMatchIndex = 0;
         let totalRoundMatches = 0;
+        let isProcessing = false; // 안정성: 카드 중복 클릭 방지
 
-        // 시작 화면 로드 시 버튼 생성
+        // 화면 로드 시 라운드 버튼 세팅
         window.onload = function() {
             const buttonContainer = document.getElementById('round-buttons');
             const possibleRounds = [4, 8, 16, 32, 64].filter(num => num <= birdData.length);
@@ -223,14 +269,14 @@
 
             possibleRounds.forEach(round => {
                 const btn = document.createElement('button');
-                btn.className = "bg-white text-slate-700 border border-slate-200 font-bold py-4 px-8 md:py-5 md:px-10 text-2xl md:text-3xl rounded-2xl hover:bg-teal-600 hover:text-white hover:border-teal-600 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex-grow md:flex-grow-0 break-keep";
+                btn.className = "bg-white text-slate-700 border border-slate-200 font-bold py-4 px-6 md:py-4 md:px-8 text-xl md:text-2xl rounded-2xl hover:bg-teal-500 hover:text-white hover:border-teal-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex-grow md:flex-grow-0 break-keep";
                 btn.innerText = `${round}강 시작`;
                 btn.onclick = () => startGame(round);
                 buttonContainer.appendChild(btn);
             });
         };
 
-        // 배열 무작위 섞기 알고리즘
+        // 배열 셔플 알고리즘
         function shuffleArray(array) {
             let curId = array.length;
             while (0 !== curId) {
@@ -245,9 +291,11 @@
 
         // 게임 시작
         function startGame(roundSize) {
+            // 데이터 안정성 확인: 라운드 시작 시 변수 초기화
             currentParticipants = shuffleArray([...birdData]).slice(0, roundSize);
             nextRoundParticipants = [];
             currentMatchIndex = 0;
+            isProcessing = false;
             
             document.getElementById('start-screen').classList.add('hidden');
             
@@ -255,16 +303,19 @@
             gameScreen.classList.remove('hidden');
             gameScreen.classList.add('flex');
             
-            // 화면 전환 시 페이드 인 애니메이션 재시작
+            document.getElementById('home-btn').classList.remove('hidden');
+            
             gameScreen.classList.remove('fade-in');
-            void gameScreen.offsetWidth; // DOM 리플로우 강제 트리거
+            void gameScreen.offsetWidth;
             gameScreen.classList.add('fade-in');
             
             updateMatchScreen();
         }
 
-        // 화면에 후보 2개 렌더링
+        // 매치 화면 업데이트 (안정성 강화)
         function updateMatchScreen() {
+            if (!currentParticipants || currentParticipants.length === 0) return;
+
             const leftBird = currentParticipants[currentMatchIndex * 2];
             const rightBird = currentParticipants[currentMatchIndex * 2 + 1];
             
@@ -274,34 +325,31 @@
             document.getElementById('round-info').innerText = roundText;
             document.getElementById('match-progress').innerText = `Match ${currentMatchIndex + 1} / ${totalRoundMatches}`;
 
-            // 왼쪽 후보 데이터 반영 및 안정성 로드
+            // 오디오 로드 시 try-catch로 예외 처리 강제 (안정성)
             document.getElementById('name-left').innerText = leftBird.name;
             document.getElementById('img-left').src = leftBird.image;
             const audioLeft = document.getElementById('audio-left');
             audioLeft.src = leftBird.sound || "";
-            try { audioLeft.load(); } catch (e) { console.warn("좌측 오디오 로드 에러:", e); }
+            try { if(audioLeft.src) audioLeft.load(); } catch (e) { console.warn(e); }
 
-            // 오른쪽 후보 데이터 반영 및 안정성 로드
             document.getElementById('name-right').innerText = rightBird.name;
             document.getElementById('img-right').src = rightBird.image;
             const audioRight = document.getElementById('audio-right');
             audioRight.src = rightBird.sound || "";
-            try { audioRight.load(); } catch (e) { console.warn("우측 오디오 로드 에러:", e); }
+            try { if(audioRight.src) audioRight.load(); } catch (e) { console.warn(e); }
         }
 
-        // 후보 선택 시 처리
-        let isProcessing = false;
-
+        // 후보 선택
         function selectCandidate(selectedIndex, event) {
+            // 안정성: 이전 작업이 끝나기 전에 클릭되는 것 방지
             if (isProcessing) return;
             isProcessing = true;
             
+            // 재생 중인 오디오 안전하게 정지
             try {
                 document.getElementById('audio-left').pause();
                 document.getElementById('audio-right').pause();
-            } catch (e) {
-                console.warn("오디오 정지 중 경고:", e);
-            }
+            } catch (e) { console.warn(e); }
 
             const winner = currentParticipants[currentMatchIndex * 2 + selectedIndex];
             nextRoundParticipants.push(winner);
@@ -322,12 +370,13 @@
                 animateCardTransition();
             }
 
+            // 트랜지션 이후 처리 제한 해제
             setTimeout(() => {
                 isProcessing = false;
-            }, 300);
+            }, 350);
         }
 
-        // 카드 넘어갈 때 부드러운 애니메이션 효과
+        // 전환 애니메이션
         function animateCardTransition() {
             const gameScreen = document.getElementById('game-screen');
             gameScreen.style.opacity = '0';
@@ -341,15 +390,17 @@
             }, 200);
         }
 
-        // 결과 화면 표시
+        // 결과 화면
         function showResult(winner) {
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('flex');
             
             const resultScreen = document.getElementById('result-screen');
             resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('flex');
             
-            // 결과 화면 페이드 인
+            document.getElementById('home-btn').classList.add('hidden');
+            
             resultScreen.classList.remove('fade-in');
             void resultScreen.offsetWidth;
             resultScreen.classList.add('fade-in');
@@ -357,13 +408,52 @@
             document.getElementById('winner-name').innerText = winner.name;
             document.getElementById('winner-img').src = winner.image;
             
-            // 우승자 이미지 둥글게(원형) 표시
-            const winnerImgContainer = document.getElementById('winner-img').parentElement;
-            winnerImgContainer.classList.add('rounded-full');
-
             const winnerAudio = document.getElementById('winner-audio');
             winnerAudio.src = winner.sound || "";
-            try { winnerAudio.load(); } catch (e) { console.warn("우승자 오디오 로드 에러:", e); }
+            try { if(winnerAudio.src) winnerAudio.load(); } catch (e) { console.warn(e); }
+            
+            isProcessing = false; // 안정성: 결과 화면 도달 시 프로세스 잠금 완벽 해제
+        }
+
+        // 홈으로 돌아가기 (안정성 강화)
+        function goHome(force = false) {
+            const isGameScreenHidden = document.getElementById('game-screen').classList.contains('hidden');
+            const isResultScreenHidden = document.getElementById('result-screen').classList.contains('hidden');
+            
+            if (isGameScreenHidden && isResultScreenHidden) return;
+            
+            if (!force && !isGameScreenHidden) {
+                if (!confirm("진행 중인 월드컵 기록이 사라집니다. 정말 처음으로 돌아가시겠습니까?")) {
+                    return;
+                }
+            }
+
+            // 모든 진행 상태 강제 초기화 (안정성)
+            currentParticipants = [];
+            nextRoundParticipants = [];
+            currentMatchIndex = 0;
+            isProcessing = false;
+
+            try {
+                document.getElementById('audio-left').pause();
+                document.getElementById('audio-right').pause();
+                document.getElementById('winner-audio').pause();
+            } catch (e) {}
+
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('flex');
+            
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('flex');
+            
+            const startScreen = document.getElementById('start-screen');
+            startScreen.classList.remove('hidden');
+            
+            document.getElementById('home-btn').classList.add('hidden');
+            
+            startScreen.classList.remove('fade-in');
+            void startScreen.offsetWidth;
+            startScreen.classList.add('fade-in');
         }
     </script>
 </body>
