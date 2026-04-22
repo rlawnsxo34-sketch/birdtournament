@@ -214,6 +214,7 @@
     <script>
         /* ========================================================================
         데이터 설정 영역
+        - sound: 소리 파일명 (예: "참새.mp3", "비둘기.m4a", "까치.wav" 등 확장자 무관)
         ======================================================================== */
         const birdData = [
             { name: "참새", image: "참새.jpg", sound: "참새.mp3" },
@@ -239,15 +240,8 @@
             { name: "원앙", image: "원앙.jpg", sound: "원앙.mp3" },
             { name: "청둥오리", image: "청둥오리.jpg", sound: "청둥오리.mp3" },
             { name: "가마우지", image: "가마우지.jpg", sound: "가마우지.mp3" },
-            { name: "딱따구리", image: "딱따구리.jpg", sound: "딱따구리.mp3" },
-            { name: "파랑새", image: "파랑새.jpg", sound: "파랑새.mp3" },
-            { name: "동박새", image: "동박새.jpg", sound: "동박새.mp3" },
-            { name: "종다리", image: "종다리.jpg", sound: "종다리.mp3" },
-            { name: "방울새", image: "방울새.jpg", sound: "방울새.mp3" },
-            { name: "지빠귀", image: "지빠귀.jpg", sound: "지빠귀.mp3" },
-            { name: "멧비둘기", image: "멧비둘기.jpg", sound: "멧비둘기.mp3" },
-            { name: "매", image: "매.jpg", sound: "매.mp3" },
-            { name: "부엉이", image: "부엉이.jpg", sound: "부엉이.mp3" }
+            { name: "딱따구리", image: "딱따구리.jpg", sound: "딱따구리.mp3" }
+            /* 안정성을 위해 최대 24강에 맞추어 24개의 데이터만 남겼습니다. */
         ];
 
         // 상태 관리 변수
@@ -260,7 +254,7 @@
         // 화면 로드 시 라운드 버튼 세팅
         window.onload = function() {
             const buttonContainer = document.getElementById('round-buttons');
-            const possibleRounds = [4, 8, 16, 32, 64].filter(num => num <= birdData.length);
+            const possibleRounds = [4, 8, 16, 24].filter(num => num <= birdData.length);
             
             if (possibleRounds.length === 0) {
                 buttonContainer.innerHTML = `<p class="col-span-2 text-rose-500 text-xl font-bold break-keep">데이터가 부족합니다. (최소 4개 이상 필요)</p>`;
@@ -319,9 +313,15 @@
             const leftBird = currentParticipants[currentMatchIndex * 2];
             const rightBird = currentParticipants[currentMatchIndex * 2 + 1];
             
-            totalRoundMatches = currentParticipants.length / 2;
+            // 안정성: 홀수 인원(예: 3강)일 경우 소수점이 생기지 않도록 내림(floor) 처리
+            totalRoundMatches = Math.floor(currentParticipants.length / 2);
 
-            let roundText = currentParticipants.length === 2 ? "결승전" : `${currentParticipants.length}강`;
+            let roundText = "";
+            if (currentParticipants.length === 2) roundText = "결승전";
+            else if (currentParticipants.length === 3) roundText = "준결승 (3강)";
+            else if (currentParticipants.length === 4) roundText = "준결승전";
+            else roundText = `${currentParticipants.length}강`;
+            
             document.getElementById('round-info').innerText = roundText;
             document.getElementById('match-progress').innerText = `Match ${currentMatchIndex + 1} / ${totalRoundMatches}`;
 
@@ -357,6 +357,11 @@
             currentMatchIndex++;
 
             if (currentMatchIndex >= totalRoundMatches) {
+                // 안정성: 홀수 인원일 경우 (예: 3강에서 1경기가 끝난 후) 남은 1명은 자동 부전승 처리
+                if (currentParticipants.length % 2 !== 0) {
+                    nextRoundParticipants.push(currentParticipants[currentParticipants.length - 1]);
+                }
+
                 currentParticipants = nextRoundParticipants;
                 nextRoundParticipants = [];
                 currentMatchIndex = 0;
