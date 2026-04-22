@@ -47,6 +47,7 @@
             height: 48px;
             outline: none;
             border-radius: 100px;
+            transition: all 0.3s ease;
         }
         audio::-webkit-media-controls-panel {
             background-color: transparent;
@@ -108,7 +109,7 @@
              ========================================== -->
         <div id="start-screen" class="glass-panel rounded-[2rem] p-8 md:p-14 max-w-4xl w-full text-center relative z-10 fade-in max-h-full overflow-y-auto custom-scrollbar flex flex-col items-center">
             
-            <!-- 업로드해주신 마리 캐릭터 이미지 적용 (경로를 파일명과 동일하게 지정) -->
+            <!-- 업로드해주신 마리 캐릭터 이미지 적용 -->
             <img src="계절(봄)_새와_함께_마리.png" alt="새와 함께 마리" class="w-48 md:w-56 h-auto mb-6 animate-float drop-shadow-xl" onerror="this.style.display='none';">
 
             <span class="inline-block py-1.5 px-5 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 text-teal-700 font-bold text-sm tracking-widest mb-6 shadow-sm">SOUND TOURNAMENT</span>
@@ -144,7 +145,8 @@
                     <div class="shrink-0 flex flex-col items-center">
                         <h3 id="name-left" class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight break-keep">이름</h3>
                         <div class="w-full space-y-4">
-                            <div class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200" onclick="event.stopPropagation();">
+                            <!-- 오디오 컨테이너: 파일 에러 시 시각적 피드백 제공 -->
+                            <div id="audio-container-left" class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200 transition-colors" onclick="event.stopPropagation();">
                                 <audio id="audio-left" controls controlsList="nodownload"></audio>
                             </div>
                             <button class="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold py-3.5 md:py-4 px-6 text-xl md:text-2xl rounded-full group-hover:from-teal-500 group-hover:to-emerald-500 transition-all duration-300 w-full shadow-lg flex items-center justify-center gap-2">
@@ -169,7 +171,8 @@
                     <div class="shrink-0 flex flex-col items-center">
                         <h3 id="name-right" class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight break-keep">이름</h3>
                         <div class="w-full space-y-4">
-                            <div class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200" onclick="event.stopPropagation();">
+                            <!-- 오디오 컨테이너 -->
+                            <div id="audio-container-right" class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200 transition-colors" onclick="event.stopPropagation();">
                                 <audio id="audio-right" controls controlsList="nodownload"></audio>
                             </div>
                             <button class="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold py-3.5 md:py-4 px-6 text-xl md:text-2xl rounded-full group-hover:from-teal-500 group-hover:to-emerald-500 transition-all duration-300 w-full shadow-lg flex items-center justify-center gap-2">
@@ -198,7 +201,7 @@
             </div>
             
             <div class="shrink-0 w-full">
-                <div class="mb-8 bg-slate-50/80 p-5 rounded-3xl border border-slate-200 shadow-inner">
+                <div id="audio-container-winner" class="mb-8 bg-slate-50/80 p-5 rounded-3xl border border-slate-200 shadow-inner transition-colors">
                     <p class="text-base md:text-lg text-slate-500 font-bold mb-3 break-keep">우승한 새의 소리 감상하기</p>
                     <audio id="winner-audio" controls class="mx-auto w-full md:w-4/5"></audio>
                 </div>
@@ -241,7 +244,6 @@
             { name: "청둥오리", image: "청둥오리.jpg", sound: "청둥오리.mp3" },
             { name: "가마우지", image: "가마우지.jpg", sound: "가마우지.mp3" },
             { name: "딱따구리", image: "딱따구리.jpg", sound: "딱따구리.mp3" }
-            /* 안정성을 위해 최대 24강에 맞추어 24개의 데이터만 남겼습니다. */
         ];
 
         // 상태 관리 변수
@@ -283,9 +285,40 @@
             return array;
         }
 
+        // 안정성: 오디오 객체를 완벽히 초기화하고 로드하는 전용 함수 (m4a, mp3 등 호환)
+        function setupAudioPlayer(audioId, containerId, soundSrc) {
+            const audioEl = document.getElementById(audioId);
+            const container = document.getElementById(containerId);
+            
+            // 1. 에러 스타일 초기화 (정상 상태로 되돌림)
+            container.classList.remove('border-rose-400', 'bg-rose-50');
+            
+            try {
+                // 2. 진행 중이던 소리 중지 및 캐시 제거 (초기화)
+                audioEl.pause();
+                audioEl.currentTime = 0;
+                audioEl.removeAttribute('src');
+            } catch (e) {}
+
+            if (soundSrc) {
+                // 3. 파일 로드 에러 처리 (파일을 못 찾았을 경우 붉게 표시)
+                audioEl.onerror = () => {
+                    console.warn(`[로드 실패] 파일을 찾을 수 없습니다: ${soundSrc}`);
+                    container.classList.add('border-rose-400', 'bg-rose-50');
+                };
+
+                // 4. 새로운 소스 부여 후 재로드
+                audioEl.src = soundSrc;
+                try { 
+                    audioEl.load(); 
+                } catch (e) { 
+                    console.warn(e); 
+                }
+            }
+        }
+
         // 게임 시작
         function startGame(roundSize) {
-            // 데이터 안정성 확인: 라운드 시작 시 변수 초기화
             currentParticipants = shuffleArray([...birdData]).slice(0, roundSize);
             nextRoundParticipants = [];
             currentMatchIndex = 0;
@@ -306,14 +339,13 @@
             updateMatchScreen();
         }
 
-        // 매치 화면 업데이트 (안정성 강화)
+        // 매치 화면 업데이트
         function updateMatchScreen() {
             if (!currentParticipants || currentParticipants.length === 0) return;
 
             const leftBird = currentParticipants[currentMatchIndex * 2];
             const rightBird = currentParticipants[currentMatchIndex * 2 + 1];
             
-            // 안정성: 홀수 인원(예: 3강)일 경우 소수점이 생기지 않도록 내림(floor) 처리
             totalRoundMatches = Math.floor(currentParticipants.length / 2);
 
             let roundText = "";
@@ -325,31 +357,26 @@
             document.getElementById('round-info').innerText = roundText;
             document.getElementById('match-progress').innerText = `Match ${currentMatchIndex + 1} / ${totalRoundMatches}`;
 
-            // 오디오 로드 시 try-catch로 예외 처리 강제 (안정성)
+            // 왼쪽/오른쪽 데이터 및 오디오 세팅 (setupAudioPlayer 함수를 통해 안전하게 적용)
             document.getElementById('name-left').innerText = leftBird.name;
             document.getElementById('img-left').src = leftBird.image;
-            const audioLeft = document.getElementById('audio-left');
-            audioLeft.src = leftBird.sound || "";
-            try { if(audioLeft.src) audioLeft.load(); } catch (e) { console.warn(e); }
+            setupAudioPlayer('audio-left', 'audio-container-left', leftBird.sound);
 
             document.getElementById('name-right').innerText = rightBird.name;
             document.getElementById('img-right').src = rightBird.image;
-            const audioRight = document.getElementById('audio-right');
-            audioRight.src = rightBird.sound || "";
-            try { if(audioRight.src) audioRight.load(); } catch (e) { console.warn(e); }
+            setupAudioPlayer('audio-right', 'audio-container-right', rightBird.sound);
         }
 
         // 후보 선택
         function selectCandidate(selectedIndex, event) {
-            // 안정성: 이전 작업이 끝나기 전에 클릭되는 것 방지
             if (isProcessing) return;
             isProcessing = true;
             
-            // 재생 중인 오디오 안전하게 정지
+            // 모든 오디오 안전하게 정지
             try {
                 document.getElementById('audio-left').pause();
                 document.getElementById('audio-right').pause();
-            } catch (e) { console.warn(e); }
+            } catch (e) {}
 
             const winner = currentParticipants[currentMatchIndex * 2 + selectedIndex];
             nextRoundParticipants.push(winner);
@@ -357,7 +384,6 @@
             currentMatchIndex++;
 
             if (currentMatchIndex >= totalRoundMatches) {
-                // 안정성: 홀수 인원일 경우 (예: 3강에서 1경기가 끝난 후) 남은 1명은 자동 부전승 처리
                 if (currentParticipants.length % 2 !== 0) {
                     nextRoundParticipants.push(currentParticipants[currentParticipants.length - 1]);
                 }
@@ -375,7 +401,6 @@
                 animateCardTransition();
             }
 
-            // 트랜지션 이후 처리 제한 해제
             setTimeout(() => {
                 isProcessing = false;
             }, 350);
@@ -413,14 +438,13 @@
             document.getElementById('winner-name').innerText = winner.name;
             document.getElementById('winner-img').src = winner.image;
             
-            const winnerAudio = document.getElementById('winner-audio');
-            winnerAudio.src = winner.sound || "";
-            try { if(winnerAudio.src) winnerAudio.load(); } catch (e) { console.warn(e); }
+            // 우승자 오디오 안전하게 세팅
+            setupAudioPlayer('winner-audio', 'audio-container-winner', winner.sound);
             
-            isProcessing = false; // 안정성: 결과 화면 도달 시 프로세스 잠금 완벽 해제
+            isProcessing = false;
         }
 
-        // 홈으로 돌아가기 (안정성 강화)
+        // 홈으로 돌아가기
         function goHome(force = false) {
             const isGameScreenHidden = document.getElementById('game-screen').classList.contains('hidden');
             const isResultScreenHidden = document.getElementById('result-screen').classList.contains('hidden');
@@ -433,12 +457,12 @@
                 }
             }
 
-            // 모든 진행 상태 강제 초기화 (안정성)
             currentParticipants = [];
             nextRoundParticipants = [];
             currentMatchIndex = 0;
             isProcessing = false;
 
+            // 오디오 중지 및 해제
             try {
                 document.getElementById('audio-left').pause();
                 document.getElementById('audio-right').pause();
