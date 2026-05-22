@@ -31,7 +31,7 @@
             background: #94a3b8;
         }
 
-        /* 카드 호버 효과: 부드럽게 떠오르며 그림자 강조 */
+        /* 카드 호버 효과 */
         .card-hover {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -41,6 +41,15 @@
             border-color: rgba(20, 184, 166, 0.3);
         }
 
+        /* 작은 카드 호버 (도감용) */
+        .list-card-hover {
+            transition: all 0.3s ease;
+        }
+        .list-card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+
         /* 오디오 플레이어 스타일 */
         audio {
             width: 100%;
@@ -48,6 +57,10 @@
             outline: none;
             border-radius: 100px;
             transition: all 0.3s ease;
+        }
+        /* 도감용 작은 오디오 */
+        .small-audio {
+            height: 36px;
         }
         audio::-webkit-media-controls-panel {
             background-color: transparent;
@@ -109,20 +122,42 @@
              ========================================== -->
         <div id="start-screen" class="glass-panel rounded-[2rem] p-8 md:p-14 max-w-4xl w-full text-center relative z-10 fade-in max-h-full overflow-y-auto custom-scrollbar flex flex-col items-center">
             
-            <!-- 업로드해주신 마리 캐릭터 이미지 적용 -->
+            <!-- 마리 캐릭터 이미지 -->
             <img src="계절(봄)_새와_함께_마리.png" alt="새와 함께 마리" class="w-48 md:w-56 h-auto mb-6 animate-float drop-shadow-xl" onerror="this.style.display='none';">
 
             <span class="inline-block py-1.5 px-5 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 text-teal-700 font-bold text-sm tracking-widest mb-6 shadow-sm">SOUND TOURNAMENT</span>
             <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-slate-800 break-keep leading-tight">가장 아름다운<br/>새소리를 찾아보세요</h2>
             <p class="text-slate-500 mb-10 text-lg md:text-xl break-keep font-medium">진행할 라운드를 선택하여 이상형 월드컵을 시작합니다.</p>
             
-            <div class="flex flex-wrap justify-center gap-4 w-full" id="round-buttons">
+            <div class="flex flex-wrap justify-center gap-4 w-full mb-8" id="round-buttons">
                 <!-- 자바스크립트에서 버튼을 생성합니다 -->
+            </div>
+
+            <!-- 새 도감 보기 버튼 추가 -->
+            <div class="w-full pt-8 border-t border-slate-200/50">
+                <button onclick="showListScreen()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-8 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 mx-auto">
+                    <span>📋</span> 참가 새 도감 미리보기
+                </button>
             </div>
         </div>
 
         <!-- ==========================================
-             2. 게임(월드컵) 화면
+             2. 새 도감(미리보기) 화면
+             ========================================== -->
+        <div id="list-screen" class="hidden glass-panel rounded-[2rem] p-6 md:p-10 w-full h-full max-w-[90rem] flex-col relative z-10 fade-in">
+            <div class="shrink-0 mb-6 flex flex-col items-center">
+                <h2 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">참가 새 도감 📖</h2>
+                <p class="text-slate-500 mt-2 font-medium">총 24마리의 새와 소리를 미리 확인해보세요.</p>
+            </div>
+            
+            <!-- 리스트 스크롤 영역 -->
+            <div id="bird-list-container" class="flex-1 overflow-y-auto custom-scrollbar pr-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 content-start">
+                <!-- 자바스크립트에서 동적으로 카드를 생성합니다 -->
+            </div>
+        </div>
+
+        <!-- ==========================================
+             3. 게임(월드컵) 화면
              ========================================== -->
         <div id="game-screen" class="hidden w-full h-full max-w-[90rem] flex-col items-center justify-center relative z-10 fade-in py-2">
             
@@ -145,7 +180,6 @@
                     <div class="shrink-0 flex flex-col items-center">
                         <h3 id="name-left" class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight break-keep">이름</h3>
                         <div class="w-full space-y-4">
-                            <!-- 오디오 컨테이너: 파일 에러 시 시각적 피드백 제공 -->
                             <div id="audio-container-left" class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200 transition-colors" onclick="event.stopPropagation();">
                                 <audio id="audio-left" controls controlsList="nodownload"></audio>
                             </div>
@@ -171,7 +205,6 @@
                     <div class="shrink-0 flex flex-col items-center">
                         <h3 id="name-right" class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight break-keep">이름</h3>
                         <div class="w-full space-y-4">
-                            <!-- 오디오 컨테이너 -->
                             <div id="audio-container-right" class="w-full bg-slate-100/50 p-1.5 rounded-full border border-slate-200 transition-colors" onclick="event.stopPropagation();">
                                 <audio id="audio-right" controls controlsList="nodownload"></audio>
                             </div>
@@ -186,7 +219,7 @@
         </div>
 
         <!-- ==========================================
-             3. 결과(우승) 화면
+             4. 결과(우승) 화면
              ========================================== -->
         <div id="result-screen" class="hidden glass-panel rounded-[2rem] p-10 md:p-14 max-w-3xl w-full h-full max-h-[800px] flex-col items-center justify-center text-center relative z-10 fade-in">
             <div class="shrink-0">
@@ -217,7 +250,6 @@
     <script>
         /* ========================================================================
         데이터 설정 영역
-        - sound: 소리 파일명 (예: "참새.mp3", "비둘기.m4a", "까치.wav" 등 확장자 무관)
         ======================================================================== */
         const birdData = [
             { name: "꾀꼬리", image: "꾀꼬리.jpg", sound: "꾀꼬리.mp3" },
@@ -251,7 +283,17 @@
         let nextRoundParticipants = [];
         let currentMatchIndex = 0;
         let totalRoundMatches = 0;
-        let isProcessing = false; // 안정성: 카드 중복 클릭 방지
+        let isProcessing = false;
+
+        // 안정성: 글로벌 오디오 재생 이벤트 (하나의 오디오가 재생되면 나머지는 멈춤)
+        document.addEventListener('play', function(e){
+            var audios = document.getElementsByTagName('audio');
+            for(var i = 0, len = audios.length; i < len; i++){
+                if(audios[i] != e.target){
+                    audios[i].pause();
+                }
+            }
+        }, true);
 
         // 화면 로드 시 라운드 버튼 세팅
         window.onload = function() {
@@ -272,6 +314,38 @@
             });
         };
 
+        // 도감(미리보기) 화면 표시 함수
+        function showListScreen() {
+            document.getElementById('start-screen').classList.add('hidden');
+            
+            const listScreen = document.getElementById('list-screen');
+            listScreen.classList.remove('hidden');
+            listScreen.classList.add('flex');
+            
+            document.getElementById('home-btn').classList.remove('hidden');
+
+            const container = document.getElementById('bird-list-container');
+            
+            // 안정성: 도감 카드가 생성되지 않았다면 최초 1회만 생성
+            if (container.children.length === 0) {
+                birdData.forEach((bird) => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl shadow-sm border border-slate-100 p-3 md:p-4 flex flex-col items-center list-card-hover";
+                    
+                    card.innerHTML = `
+                        <div class="aspect-square w-full rounded-xl overflow-hidden bg-slate-50 mb-3 relative">
+                            <img src="${bird.image}" alt="${bird.name}" onerror="this.onerror=null; this.src='https://placehold.co/400x400/f8fafc/94a3b8?text=No+Image';" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="text-lg md:text-xl font-bold text-slate-800 mb-3 text-center break-keep">${bird.name}</h4>
+                        <div class="w-full bg-slate-50 p-1 rounded-full border border-slate-100">
+                            <audio src="${bird.sound}" controls controlsList="nodownload" class="small-audio"></audio>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+        }
+
         // 배열 셔플 알고리즘
         function shuffleArray(array) {
             let curId = array.length;
@@ -285,35 +359,27 @@
             return array;
         }
 
-        // 안정성: 오디오 객체를 완벽히 초기화하고 로드하는 전용 함수 (m4a, mp3 등 호환)
+        // 안정성: 오디오 객체 초기화 및 로드 함수
         function setupAudioPlayer(audioId, containerId, soundSrc) {
             const audioEl = document.getElementById(audioId);
             const container = document.getElementById(containerId);
             
-            // 1. 에러 스타일 초기화 (정상 상태로 되돌림)
             container.classList.remove('border-rose-400', 'bg-rose-50');
             
             try {
-                // 2. 진행 중이던 소리 중지 및 캐시 제거 (초기화)
                 audioEl.pause();
                 audioEl.currentTime = 0;
                 audioEl.removeAttribute('src');
             } catch (e) {}
 
             if (soundSrc) {
-                // 3. 파일 로드 에러 처리 (파일을 못 찾았을 경우 붉게 표시)
                 audioEl.onerror = () => {
                     console.warn(`[로드 실패] 파일을 찾을 수 없습니다: ${soundSrc}`);
                     container.classList.add('border-rose-400', 'bg-rose-50');
                 };
 
-                // 4. 새로운 소스 부여 후 재로드
                 audioEl.src = soundSrc;
-                try { 
-                    audioEl.load(); 
-                } catch (e) { 
-                    console.warn(e); 
-                }
+                try { audioEl.load(); } catch (e) { console.warn(e); }
             }
         }
 
@@ -326,6 +392,13 @@
             
             document.getElementById('start-screen').classList.add('hidden');
             
+            // 만약 도감 화면에서 넘어왔을 경우 방어 처리
+            document.getElementById('list-screen').classList.add('hidden');
+            document.getElementById('list-screen').classList.remove('flex');
+            
+            // 모든 오디오 정지
+            pauseAllAudios();
+
             const gameScreen = document.getElementById('game-screen');
             gameScreen.classList.remove('hidden');
             gameScreen.classList.add('flex');
@@ -357,7 +430,6 @@
             document.getElementById('round-info').innerText = roundText;
             document.getElementById('match-progress').innerText = `Match ${currentMatchIndex + 1} / ${totalRoundMatches}`;
 
-            // 왼쪽/오른쪽 데이터 및 오디오 세팅 (setupAudioPlayer 함수를 통해 안전하게 적용)
             document.getElementById('name-left').innerText = leftBird.name;
             document.getElementById('img-left').src = leftBird.image;
             setupAudioPlayer('audio-left', 'audio-container-left', leftBird.sound);
@@ -372,11 +444,7 @@
             if (isProcessing) return;
             isProcessing = true;
             
-            // 모든 오디오 안전하게 정지
-            try {
-                document.getElementById('audio-left').pause();
-                document.getElementById('audio-right').pause();
-            } catch (e) {}
+            pauseAllAudios();
 
             const winner = currentParticipants[currentMatchIndex * 2 + selectedIndex];
             nextRoundParticipants.push(winner);
@@ -438,43 +506,55 @@
             document.getElementById('winner-name').innerText = winner.name;
             document.getElementById('winner-img').src = winner.image;
             
-            // 우승자 오디오 안전하게 세팅
             setupAudioPlayer('winner-audio', 'audio-container-winner', winner.sound);
             
             isProcessing = false;
         }
 
-        // 홈으로 돌아가기
+        // 페이지 내의 모든 오디오 강제 정지 유틸리티
+        function pauseAllAudios() {
+            const audios = document.getElementsByTagName('audio');
+            for(let i = 0; i < audios.length; i++) {
+                try { audios[i].pause(); } catch(e) {}
+            }
+        }
+
+        // 홈으로 돌아가기 (안정성 강화)
         function goHome(force = false) {
             const isGameScreenHidden = document.getElementById('game-screen').classList.contains('hidden');
             const isResultScreenHidden = document.getElementById('result-screen').classList.contains('hidden');
+            const isListScreenHidden = document.getElementById('list-screen').classList.contains('hidden');
             
-            if (isGameScreenHidden && isResultScreenHidden) return;
+            // 이미 시작 화면인 경우 무시
+            if (isGameScreenHidden && isResultScreenHidden && isListScreenHidden) return;
             
+            // 게임 진행 중일 경우 확인
             if (!force && !isGameScreenHidden) {
                 if (!confirm("진행 중인 월드컵 기록이 사라집니다. 정말 처음으로 돌아가시겠습니까?")) {
                     return;
                 }
             }
 
+            // 변수 초기화
             currentParticipants = [];
             nextRoundParticipants = [];
             currentMatchIndex = 0;
             isProcessing = false;
 
-            // 오디오 중지 및 해제
-            try {
-                document.getElementById('audio-left').pause();
-                document.getElementById('audio-right').pause();
-                document.getElementById('winner-audio').pause();
-            } catch (e) {}
+            // 도감 화면 등을 포함해 재생 중이던 모든 오디오 정지
+            pauseAllAudios();
 
+            // 모든 화면 숨기기
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('flex');
             
             document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('flex');
+
+            document.getElementById('list-screen').classList.add('hidden');
+            document.getElementById('list-screen').classList.remove('flex');
             
+            // 시작 화면 보이기
             const startScreen = document.getElementById('start-screen');
             startScreen.classList.remove('hidden');
             
